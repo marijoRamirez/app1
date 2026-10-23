@@ -8,19 +8,44 @@ import { useCharacteres } from "./hooks/useCharacteres";
 function App() {
   const [page, setPage] = useState(1);
   const { character, totalPages, loading, error } = useCharacteres(page);
+  const [latitude, setLatitude] = useState(() => {
+    const lat = localStorage.getItem("latitude");
+    return lat ? parseFloat(lat) : "No se especifica la latitud";
+  });
+
+  const obtenerYGuardarLatitud = () => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const latActual = position.coords.latitude;
+        localStorage.setItem("latitudedeahoritamismoenvivoyendirecto", latActual);
+        setLatitude(latActual);
+      });
+    } else {
+      alert("tu navegador tonto");
+    }
+  };
 
   return (
     <div className="app-container">
       <header className="app-header">
         <h1>El clima de hoy</h1>
         <p>Explora el maravilloso clima del mundo</p>
+        <p>latitud de ahorita mismo chaval: {latitude}</p>
       </header>
+
+      <div>
+        <button onClick={obtenerYGuardarLatitud}>
+          Guardar
+        </button>
+      </div>
 
       <FragmentBarato />
 
+      
+
       <main className="cards-grid" style={{ display: "flex", gap: "20px", flexWrap: "wrap", padding: "20px" }}>
         <ClimaCard
-          latitude={21.12}
+          latitude={typeof latitude === "number" ? latitude : 0.0}
           longitude={-101.68}
           elevation={1815}
           timezone="America/Mexico_City"
